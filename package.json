@@ -1,0 +1,25 @@
+{
+  "name": "stephsy",
+  "version": "1.0.0",
+  "description": "A solution for group therapy schedules and payments",
+  "main": "index.js",
+  "scripts": {
+    "server": "cd server && npm run start",
+    "client": "cd client && npm run start",
+    "i-server": "cd server && npm install",
+    "i-client": "cd client && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/asyndesis/moistdads.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/asyndesis/moistdads/issues"
+  },
+  "homepage": "https://github.com/asyndesis/moistdads#readme",
+  "dependencies": {
+    "moistdadsdb": "file:server"
+  }
+}
