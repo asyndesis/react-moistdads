@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
 import tools from '../tools'
 
 let uploadModel = new mongoose.Schema({
@@ -7,12 +6,19 @@ let uploadModel = new mongoose.Schema({
     type: String,
     unique: true
   },
-  
+  files: {
+    type: Array 
+  },
+  date: {
+    type: Date,
+    // `Date.now()` returns the current unix timestamp as a number
+    default: Date.now
+  }
 });
 
 /* Middleware */
 uploadModel.pre('save',function(next) {
-
+  next();
 });
 uploadModel.post('save', function(err, payload, next) {
   if (err){

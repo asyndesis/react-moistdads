@@ -23,7 +23,7 @@ process.on('SIGINT', function() {
 });
 
 mongoose.model('User', userModel, 'users');
-mongoose.model('Upload', uploadModel, 'users');
+mongoose.model('Upload', uploadModel, 'uploads');
 
 db.connect = (uri) => {
   mongoose.connect(uri,{ useNewUrlParser: true, useCreateIndex: true })

@@ -11,18 +11,36 @@ publicController = {
 
   upload: (req, res, next) => {
     let files = [];
-    //if the files have been saved in mulcher
-    if (res.req.files){
-      files = res.req.files;
-      files.forEach(function (f) {
-        if (f.filename){
-          tools.burp('FgCyan','webserver','\''+f.filename+'\' uploaded to server.','controllers.public' )
-        }
-      });
+    let upload = new Upload();
+        upload.id = uuid.v1()
+        upload.files = [];
+    //if this error comes up, something is happing at middleware level (routes middleware)
+    if (!res.req.files){   
+      tools.burp('FgYellow','webserver','No file was uploaded.','controllers.public' )
+      next();
     }
-    /* Todo: req.body needs to be a loop, because this could be an array. */
 
-    res.status('201').send({});
+    files = res.req.files;
+    //loop through files in the formdata
+    files.forEach(function (f) {
+      //prep that upload entry for the database
+      upload.files.push(f);
+      if (f.filename){
+        tools.burp('FgCyan','webserver','\''+f.filename+'\' uploaded to server.','controllers.public' )
+      }
+    });
+
+    //db saving
+    upload.save().then((payload) => {
+      tools.burp('FgCyan','webserver','Upload with id: \''+payload.id+'\' has been created','controllers.public' )
+      res.status('201').send(payload);
+      next();
+    }).catch((error) => { 
+      tools.burp('FgCyan','webserver','Upload could not be created.','controllers.public' )
+      res.status('400').send({message: 'Upload could not be created.'});
+      next();
+    });
+
   },
 
 

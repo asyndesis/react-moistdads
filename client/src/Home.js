@@ -40,7 +40,6 @@ constructor (props) {
       console.log('successful files:', result.successful)
       console.log('failed files:', result.failed)
     })
-    console.log('farts');
     this.handleOpen = this.handleOpen.bind(this)
     this.handleClose = this.handleClose.bind(this)
 
