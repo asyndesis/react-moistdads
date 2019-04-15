@@ -18,6 +18,8 @@ constructor (props) {
       latestDads: []
     }
 
+    this.domainName = 'vyzed.com';
+
     this.uppy = Uppy({
       debug: true,
       autoProceed: false,
@@ -30,7 +32,7 @@ constructor (props) {
     })
     .use(Webcam, { id: 'Webcam'})
     .use(XHRUpload, {
-      endpoint: 'http://localhost:4100/api/upload',
+      endpoint: 'http://'+this.domainName+':4100/api/upload',
       id: 'XHRUpload'
     })
     .on('complete', (result) => {
@@ -63,17 +65,17 @@ constructor (props) {
   }
 
   updateDadOfDay(){
-    fetch('http://localhost:4100/api/getMoistDadOfDay', {
+    fetch('http://'+domainName+':4100/api/getMoistDadOfDay', {
       method: 'GET'
     }).then(res => res.json())
     .then(response => {
-      this.setState({moistDad:'http://localhost:4100/'+response[0].files[0].path})
+      this.setState({moistDad:'http://'+domainName+':4100/'+response[0].files[0].path})
     })
     .catch(error => console.error('Error:', error));
   }
 
   updatePastDads(){
-    fetch('http://localhost:4100/api/getLatestDads', {
+    fetch('http://'+domainName+':4100/api/getLatestDads', {
       method: 'GET'
     }).then(res => res.json())
     .then(response => {
@@ -94,7 +96,7 @@ constructor (props) {
           <div className="moist-old-dads">
           {this.state.latestDads.map((dad, index) => (
             <div key={index}>
-              <img src={'http://localhost:4100/'+dad.files[0].path}/>
+              <img src={'http://'+domainName+':4100/'+dad.files[0].path}/>
             </div>
           ))}
           </div>
