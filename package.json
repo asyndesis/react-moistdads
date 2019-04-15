@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/asyndesis/moistdads#readme",
   "dependencies": {
-    "moistdadsdb": "file:server"
+    "moistdadsdb": "file:server",
+    "moment": "^2.24.0"
   }
 }

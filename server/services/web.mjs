@@ -8,6 +8,7 @@ import socketio from 'socket.io'
 import cors from 'cors'
 import { router } from '../routes/'
 import tools from '../tools/'
+import path from 'path';
 
 let thisFileName = 'services.web'
 let webEngines = {}
@@ -28,6 +29,10 @@ webEngines.startWebServer = (webServerPort) => {
       next();
     });
   });
+
+  /* Uploads folder */
+  //console.log(process.cwd());
+  webServer.use('/uploads', express.static(process.cwd() + '/uploads'));
 
   webServer.use(cors())
   webServer.use('/api',router)

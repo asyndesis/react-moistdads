@@ -3,6 +3,7 @@ import tools from '../tools';
 import uuid from 'node-uuid';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import moment from 'moment';
 
 const Upload = mongoose.model('Upload');
 let publicController = {};
@@ -42,6 +43,38 @@ publicController = {
     });
 
   },
+  getMoistDadOfDay: (req, res, next) => {
+    let today = new Date();
+    let yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    Upload.find({
+      date: {
+        $gte: moment(yesterday).startOf('day').toDate(),
+        $lte: moment(today).endOf('day').toDate()
+      }
+    }).then((payload) => {
+      tools.burp('FgCyan','webserver','Moist dad of day requested.','controllers.public' )
+      res.status('201').send(payload);
+      next();
+    }).catch((error) => { 
+      tools.burp('FgCyan','webserver','Moist dad of day failed.','controllers.public' )
+      res.status('400').send({message: 'Moist dad could not be found.'});
+      next();
+    });
+  },
+
+  getLatestDads: (req, res, next) => {
+    Upload.find({
+    }).sort('-date').limit(10).then((payload) => {
+      tools.burp('FgCyan','webserver','Latest dads requested.','controllers.public' )
+      res.status('201').send(payload);
+      next();
+    }).catch((error) => { 
+      tools.burp('FgCyan','webserver','Latest dads failed.','controllers.public' )
+      res.status('400').send({message: 'Latest dads could not be found.'});
+      next();
+    });
+  }
 
 
 }

@@ -7,12 +7,15 @@ import Webcam from '@uppy/webcam';
 import XHRUpload from '@uppy/xhr-upload';
 import SweetAlert from 'sweetalert2-react';
 
+
 class Home extends Component {
 constructor (props) {
     super(props)
 
     this.state = {
-      modalOpen: false
+      modalOpen: false,
+      moistDad:'',
+      latestDads: []
     }
 
     this.uppy = Uppy({
@@ -36,6 +39,7 @@ constructor (props) {
         alertTitle: 'Moist!',
         alertText: 'You will be a Moist Dad on:'
       });
+      this.updatePastDads()
       this.uppy.reset()
       console.log('successful files:', result.successful)
       console.log('failed files:', result.failed)
@@ -58,11 +62,46 @@ constructor (props) {
     })
   }
 
+  updateDadOfDay(){
+    fetch('http://localhost:4100/api/getMoistDadOfDay', {
+      method: 'GET'
+    }).then(res => res.json())
+    .then(response => {
+      this.setState({moistDad:'http://localhost:4100/'+response[0].files[0].path})
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
+  updatePastDads(){
+    fetch('http://localhost:4100/api/getLatestDads', {
+      method: 'GET'
+    }).then(res => res.json())
+    .then(response => {
+      console.log(response);
+      this.setState({latestDads: response});
+    })
+    .catch(error => console.error('Error:', error));
+  }
+
+  componentDidMount() {
+    this.updateDadOfDay()
+    this.updatePastDads()
+  }
+
   render () {
     return (
       <div>
-        <button className='uppy-btn btn btn-lg btn-success' onClick={this.handleOpen}>Submit a MoistDad</button>
-        <DashboardModal
+          <div className="moist-old-dads">
+          {this.state.latestDads.map((dad, index) => (
+            <div key={index}>
+              <img src={'http://localhost:4100/'+dad.files[0].path}/>
+            </div>
+          ))}
+          </div>
+          <div className="moist-bg" style={{backgroundImage:'url("'+this.state.moistDad+'")'}}>
+          </div>
+          <button className='uppy-btn btn btn-lg btn-success' onClick={this.handleOpen}>Submit a MoistDad</button>
+          <DashboardModal
           uppy={this.uppy}
           closeModalOnClickOutside
           open={this.state.modalOpen}
@@ -71,13 +110,13 @@ constructor (props) {
           snowProgressDetails={true}
           onRequestClose={this.handleClose}
           plugins={['Webcam','XHRUpload']}
-        />
-        <SweetAlert
+          />
+          <SweetAlert
           show={this.state.alertOpen}
           title={this.state.alertTitle}
           text={this.state.alertText}
           onConfirm={() => this.setState({ alertOpen: false })}
-        />
+          />
       </div>
     );
   }

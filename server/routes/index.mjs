@@ -65,5 +65,7 @@ router.post('/updateCurrentUser',userController.updateCurrentUser)
 
 /* Moist Routes */
 router.post('/upload',upload,publicController.upload)
+router.get('/getMoistDadOfDay',publicController.getMoistDadOfDay)
+router.get('/getLatestDads',publicController.getLatestDads)
 
 export {router}
