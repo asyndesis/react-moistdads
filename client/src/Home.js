@@ -65,17 +65,17 @@ constructor (props) {
   }
 
   updateDadOfDay(){
-    fetch('http://'+dName+':4100/api/getMoistDadOfDay', {
+    fetch('http://'+this.dName+':4100/api/getMoistDadOfDay', {
       method: 'GET'
     }).then(res => res.json())
     .then(response => {
-      this.setState({moistDad:'http://'+dName+':4100/'+response[0].files[0].path})
+      this.setState({moistDad:'http://'+this.dName+':4100/'+response[0].files[0].path})
     })
     .catch(error => console.error('Error:', error));
   }
 
   updatePastDads(){
-    fetch('http://'+dName+':4100/api/getLatestDads', {
+    fetch('http://'+this.dName+':4100/api/getLatestDads', {
       method: 'GET'
     }).then(res => res.json())
     .then(response => {
@@ -96,7 +96,7 @@ constructor (props) {
           <div className="moist-old-dads">
           {this.state.latestDads.map((dad, index) => (
             <div key={index}>
-              <img src={'http://'+dName+':4100/'+dad.files[0].path}/>
+              <img src={'http://'+this.dName+':4100/'+dad.files[0].path}/>
             </div>
           ))}
           </div>
