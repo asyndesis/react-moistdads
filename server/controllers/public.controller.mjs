@@ -21,7 +21,7 @@ const _saveThumbnail = (imagePath) => { // edited arg
 let publicController = {
 
   upload: (req, res, next) => {
-
+    console.log(res.req);
     let file = res.req.file;
     let upload = new Upload();
         upload.id = uuid.v1()
@@ -44,12 +44,12 @@ let publicController = {
         res.status('201').send(payload);
         next();
       }).catch((error) => { 
-        tools.burp('FgCyan','webserver','Upload could not be created.','controllers.public' )
+        tools.burp('FgYellow','webserver','Upload could not be created.','controllers.public' )
         res.status('400').send({message: 'Upload could not be created.'});
         next();
       });
     }).catch((error) => {
-      tools.burp('FgCyan','webserver','Upload could not be created.','controllers.public' )
+      tools.burp('FgYellow','webserver','Upload could not be created.','controllers.public' )
       res.status('400').send({message: 'Upload could not be created.'});
     });
 
@@ -68,7 +68,7 @@ let publicController = {
       res.status('201').send(payload);
       next();
     }).catch((error) => { 
-      tools.burp('FgCyan','webserver','Moist dad of day failed.','controllers.public' )
+      tools.burp('FgYellow','webserver','Moist dad of day failed.','controllers.public' )
       res.status('400').send({message: 'Moist dad could not be found.'});
       next();
     });

@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { view } from 'react-easy-state';
-import appStore from './appStore';
 import SweetAlert from 'sweetalert2-react';
-import { FilePond, registerPlugin } from 'react-filepond';
+import { FilePond } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
@@ -15,20 +14,26 @@ constructor (props) {
       modalOpen: false,
       moistDad:'',
       latestDads: [],
-      file: []
+      files: [],
+      alertOpen: false,
+      alertText: 'Congrats',
+      alertText: 'You have uploaded a Moist Dad!'
     }
 
     this.dName = 'localhost';
     this.handleOpen = () => {
       this.setState({
-        modalOpen: true
+        modalOpen: true,
+        files: []
       })
     }
   
     this.handleClose = () => {
       this.setState({
-        modalOpen: false
+        modalOpen: false,
+        files: []
       })
+      
     }
   }
 
@@ -39,7 +44,11 @@ constructor (props) {
       method: 'GET'
     }).then(res => res.json())
     .then(response => {
-      this.setState({moistDad:'http://'+this.dName+':4100/'+response[0].files[0].path})
+      if (response[0]){
+        this.setState({moistDad:'http://'+this.dName+':4100/'+response[0].files[0].path})
+      }else{
+
+      }
     })
     .catch(error => console.error('Error:', error));
   }
@@ -49,7 +58,6 @@ constructor (props) {
       method: 'GET'
     }).then(res => res.json())
     .then(response => {
-      console.log(response);
       this.setState({latestDads: response});
     })
     .catch(error => console.error('Error:', error));
@@ -87,7 +95,15 @@ constructor (props) {
 
             <Modal.Body>
             <FilePond maxFiles={3}
-                      server={'http://'+this.dName+':4100/api/upload'}
+                      ref={ref => this.pond = ref}
+                      server={{
+                        url: 'http://'+this.dName+':4100/api/upload'
+                      }}
+                      onprocessfiles={(error,file) => {
+                        this.updateDadOfDay()
+                        this.updatePastDads()
+                        this.setState({ alertOpen: true })
+                      }}
                       allowMultiple={true}
                       files={this.state.files}
                       onupdatefiles={fileItems => {
