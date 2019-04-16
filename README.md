@@ -6,6 +6,7 @@
 
 ### Prerequisites
 1. 🎁 (install mongodb)
+2. brew install graphicsmagick (OSX)
 
 ### Install
 1. npm run i-server

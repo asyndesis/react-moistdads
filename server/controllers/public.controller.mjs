@@ -4,42 +4,53 @@ import uuid from 'node-uuid';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
+import gm from 'gm';
 
 const Upload = mongoose.model('Upload');
-let publicController = {};
+const _saveThumbnail = (imagePath) => { // edited arg
+  return new Promise((resolve, reject) => {
+    var n=imagePath.lastIndexOf(".");
+    var thumbPath = imagePath.substring(0,n)+"_thumb"+imagePath.substring(n);
+    gm(imagePath).thumb(150, 150, `${thumbPath}`, 100, (err) => { // edited
+      if (err) reject(new Error(err));
+      resolve();
+    });
+  });
+};
 
-publicController = {
+let publicController = {
 
   upload: (req, res, next) => {
-    let files = [];
+
+    let file = res.req.file;
     let upload = new Upload();
         upload.id = uuid.v1()
         upload.files = [];
     //if this error comes up, something is happing at middleware level (routes middleware)
-    if (!res.req.files){   
+    if (!res.req.file){   
       tools.burp('FgYellow','webserver','No file was uploaded.','controllers.public' )
       next();
     }
 
-    files = res.req.files;
-    //loop through files in the formdata
-    files.forEach(function (f) {
-      //prep that upload entry for the database
-      upload.files.push(f);
-      if (f.filename){
-        tools.burp('FgCyan','webserver','\''+f.filename+'\' uploaded to server.','controllers.public' )
-      }
-    });
-
-    //db saving
-    upload.save().then((payload) => {
-      tools.burp('FgCyan','webserver','Upload with id: \''+payload.id+'\' has been created','controllers.public' )
-      res.status('201').send(payload);
-      next();
-    }).catch((error) => { 
+     // save that thumb and return a response
+    _saveThumbnail(file.path).then(() => {
+      let n=file.path.lastIndexOf(".");
+      let thumbPath = file.path.substring(0,n)+"_thumb"+file.path.substring(n);
+      file.thumbPath = thumbPath;
+      upload.files.push(file);
+      //db saving
+      upload.save().then((payload) => {
+        tools.burp('FgCyan','webserver','Upload with id: \''+payload.id+'\' has been created with a _thumb','controllers.public' )
+        res.status('201').send(payload);
+        next();
+      }).catch((error) => { 
+        tools.burp('FgCyan','webserver','Upload could not be created.','controllers.public' )
+        res.status('400').send({message: 'Upload could not be created.'});
+        next();
+      });
+    }).catch((error) => {
       tools.burp('FgCyan','webserver','Upload could not be created.','controllers.public' )
       res.status('400').send({message: 'Upload could not be created.'});
-      next();
     });
 
   },

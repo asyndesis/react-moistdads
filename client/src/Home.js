@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { view } from 'react-easy-state';
 import appStore from './appStore';
-import { DashboardModal } from '@uppy/react'
-import Uppy from '@uppy/core';
-import Webcam from '@uppy/webcam';
-import XHRUpload from '@uppy/xhr-upload';
 import SweetAlert from 'sweetalert2-react';
-
+import { FilePond, registerPlugin } from 'react-filepond';
+import 'filepond/dist/filepond.min.css';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 class Home extends Component {
 constructor (props) {
@@ -15,54 +14,25 @@ constructor (props) {
     this.state = {
       modalOpen: false,
       moistDad:'',
-      latestDads: []
+      latestDads: [],
+      file: []
     }
 
-    this.dName = 'vyzed.com';
-
-    this.uppy = Uppy({
-      debug: true,
-      autoProceed: false,
-      restrictions: {
-        maxFileSize: 5000000,
-        maxNumberOfFiles: 1,
-        minNumberOfFiles: 1,
-        allowedFileTypes: ['image/*', 'video/*']
-      }
-    })
-    .use(Webcam, { id: 'Webcam'})
-    .use(XHRUpload, {
-      endpoint: 'http://'+this.dName+':4100/api/upload',
-      id: 'XHRUpload'
-    })
-    .on('complete', (result) => {
-      this.setState({ 
-        alertOpen: true, 
-        alertTitle: 'Moist!',
-        alertText: 'You will be a Moist Dad on:'
-      });
-      this.updatePastDads()
-      this.uppy.reset()
-      console.log('successful files:', result.successful)
-      console.log('failed files:', result.failed)
-    })
-    this.handleOpen = this.handleOpen.bind(this)
-    this.handleClose = this.handleClose.bind(this)
-
-    
+    this.dName = 'localhost';
+    this.handleOpen = () => {
+      this.setState({
+        modalOpen: true
+      })
+    }
+  
+    this.handleClose = () => {
+      this.setState({
+        modalOpen: false
+      })
+    }
   }
 
-  handleOpen () {
-    this.setState({
-      modalOpen: true
-    })
-  }
 
-  handleClose () {
-    this.setState({
-      modalOpen: false
-    })
-  }
 
   updateDadOfDay(){
     fetch('http://'+this.dName+':4100/api/getMoistDadOfDay', {
@@ -85,7 +55,12 @@ constructor (props) {
     .catch(error => console.error('Error:', error));
   }
 
+  initFilePond(){
+
+  }
+
   componentDidMount() {
+    this.initFilePond()
     this.updateDadOfDay()
     this.updatePastDads()
   }
@@ -94,25 +69,35 @@ constructor (props) {
     return (
       <div>
           <div className="moist-old-dads">
-          {this.state.latestDads.map((dad, index) => (
-            <div key={index}>
-              <img src={'http://'+this.dName+':4100/'+dad.files[0].path}/>
-            </div>
-          ))}
+            {this.state.latestDads.map((dad, index) => (
+              <div key={index}>
+                <img src={'http://'+this.dName+':4100/'+dad.files[0].thumbPath}/>
+              </div>
+            ))}
           </div>
           <div className="moist-bg" style={{backgroundImage:'url("'+this.state.moistDad+'")'}}>
           </div>
-          <button className='uppy-btn btn btn-lg btn-success' onClick={this.handleOpen}>Submit a MoistDad</button>
-          <DashboardModal
-          uppy={this.uppy}
-          closeModalOnClickOutside
-          open={this.state.modalOpen}
-          note="File must be under 5MB"
-          closeAfterFinish={true}
-          snowProgressDetails={true}
-          onRequestClose={this.handleClose}
-          plugins={['Webcam','XHRUpload']}
-          />
+          <Button className="moist-modal-btn" variant="primary" onClick={this.handleOpen}>
+            Upload a Moist Dad!
+          </Button>
+          <Modal show={this.state.modalOpen} onHide={this.handleClose}>
+            <Modal.Header closeButton>
+              <Modal.Title>Upload a Moist Dad</Modal.Title>
+            </Modal.Header>
+
+            <Modal.Body>
+            <FilePond maxFiles={3}
+                      server={'http://'+this.dName+':4100/api/upload'}
+                      allowMultiple={true}
+                      files={this.state.files}
+                      onupdatefiles={fileItems => {
+                        this.setState({
+                            files: fileItems.map(fileItem => fileItem.file)
+                        })
+                      }} />
+            </Modal.Body>
+
+          </Modal>
           <SweetAlert
           show={this.state.alertOpen}
           title={this.state.alertTitle}

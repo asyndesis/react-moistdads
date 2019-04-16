@@ -1,23 +1,12 @@
-.uppy-target{
-  .uppy-Dashboard-inner{
-    margin:0 auto;
-  }
-}
-.bm-burger-button {
-  z-index:13;
-  position: fixed;
-  width: 36px;
-  height: 30px;
-  left: 36px;
-  top: 36px;
-}
-.bm-menu-wrap{
-  z-index:13;
+.moist-modal-btn{
+  position:fixed;
+  right:10px;
+  bottom:10px;
 }
 .moist-old-dads{
   background:#222;
   width:20vw;
-  height:100vh;
+  height: 100vh;
   left:0;
   position:fixed;
   overflow-y:scroll;
@@ -34,9 +23,4 @@
   background-position: center center;
   position:fixed;
   right:0;
-}
-.uppy-btn{
-  position:fixed;
-  bottom:10px;
-  right:10px;
 }

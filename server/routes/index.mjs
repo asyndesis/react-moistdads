@@ -1,22 +1,26 @@
 import express from 'express'
 import {userController} from '../controllers/user.controller'
 import {publicController} from '../controllers/public.controller'
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'
 import tools from '../tools/'
 import multer from 'multer'
+
+
+
+const router = express.Router();
 
 /* Hacky CB For Multer */
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, process.env.uploadDirectory)
+      cb(null, process.env.uploadDirectory)
   },
   filename: function (req, file, cb) {
     /* ToDo: This needs code to parse the mimetype and just append .ext to file before saving */
     cb(null, tools.generateUID() +'_'+ file.originalname);        
   }
 })
-const upload = multer({ storage: storage }).array('files[]');
-const router = express.Router();
+const upload = multer({ storage: storage }).single('filepond');
+
 
 const tokenAuth = (req, res, next) => {
   /* Non-protected routes. This is hacky. I know */
