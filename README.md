@@ -5,8 +5,9 @@
 ## General
 
 ### Prerequisites
-1. 🎁 (install mongodb)
-2. brew install graphicsmagick (OSX)
+1. install mongodb
+2. install ffmpeg
+2. install graphicsmagick
 
 ### Install
 1. npm run i-server

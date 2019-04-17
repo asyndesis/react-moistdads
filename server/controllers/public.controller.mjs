@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
 import gm from 'gm';
+import ffmpeg from 'fluent-ffmpeg';
 
 
 const Upload = mongoose.model('Upload');
@@ -14,21 +15,42 @@ const Upload = mongoose.model('Upload');
 const _saveThumbnail = (file) => { // edited arg
   let mime = file.mimetype.split('/');
       mime = mime[0];
-  console.log(mime);
+  let n, thumbPath;
+
   switch (mime){
     case 'image' :
+      n = file.path.lastIndexOf(".");
+      thumbPath = file.path.substring(0,n)+"_thumb"+file.path.substring(n);
       return new Promise((resolve, reject) => {
-        var n=file.path.lastIndexOf(".");
-        var thumbPath = file.path.substring(0,n)+"_thumb"+file.path.substring(n);
         gm(file.path).thumb(150, 150, `${thumbPath}`, 100, (err) => { // edited
           if (err) reject(new Error(err));
-          resolve();
+          resolve(thumbPath);
         });
       });
       break;
     case 'video' :
+      n = file.filename.lastIndexOf(".");
+      thumbPath = file.filename.substring(0,n)+"_thumb"+'_v'+'.png'
       return new Promise((resolve, reject) => {
-        reject(new Error('farts'));
+        ffmpeg(file.path)
+        .withVideoCodec('libx264')
+        .on('filenames', function(filenames) {
+          tools.burp('FgCyan','webserver','Will generate ' + filenames.join(', '),'controllers.public' )
+        })
+        .on('end', function() {
+          tools.burp('FgCyan','webserver','Video creenshots taken','controllers.public' )
+          resolve(process.env.uploadDirectory+'/'+thumbPath);
+        })
+        .on('error',function(err){
+          tools.burp('FgRed','webserver',err,'controllers.public' )
+        })
+        .screenshots({
+          //timestamps: ['20%', '40%', '60%'],
+          count:1,
+          filename: thumbPath,
+          folder: process.env.uploadDirectory,
+        }).outputOptions(['-vframes 1', '-vcodec png', '-f rawvideo', '-s 320x240', '-ss 00:00:01'])
+
       });
       break;
     default :
@@ -57,9 +79,7 @@ let publicController = {
     }
 
      // save that thumb
-    _saveThumbnail(file).then(() => {
-      let n=file.path.lastIndexOf(".");
-      let thumbPath = file.path.substring(0,n)+"_thumb"+file.path.substring(n);
+    _saveThumbnail(file).then((thumbPath) => {
       file.thumbPath = thumbPath;
       upload.files.push(file);
       //db saving

@@ -13,10 +13,11 @@ constructor (props) {
     this.state = {
       modalOpen: false,
       moistDad:'',
+      mediaType: false,
       latestDads: [],
       files: [],
       alertOpen: false,
-      alertText: 'Congrats',
+      alertTitle: 'Congrats',
       alertText: 'You have uploaded a Moist Dad!'
     }
 
@@ -37,17 +38,15 @@ constructor (props) {
     }
   }
 
-
-
   updateDadOfDay(){
     fetch('http://'+this.dName+':4100/api/getMoistDadOfDay', {
       method: 'GET'
     }).then(res => res.json())
     .then(response => {
       if (response[0]){
-        this.setState({moistDad:'http://'+this.dName+':4100/'+response[0].files[0].path})
-      }else{
-
+        let mime = response[0].files[0].mimetype.split('/');
+        mime = mime[0];
+        this.setState({moistDad:response[0].files[0],mediaType:mime})
       }
     })
     .catch(error => console.error('Error:', error));
@@ -63,12 +62,22 @@ constructor (props) {
     .catch(error => console.error('Error:', error));
   }
 
-  initFilePond(){
+  generateDadMedia(){
+    let farts = '';
+    if (this.state.mediaType === 'video'){
+      farts = (
+        <video className="moist-bg" autoPlay loop id="video-background" muted playsInline >
+          <source src={'http://'+this.dName+':4100/'+this.state.moistDad.path} type={this.state.moistDad.mimetype}></source>
+        </video>
+      );
+    }else if (this.state.mediaType === 'image'){
+      farts = (<div className="moist-bg" style={{backgroundImage:'url("'+'http://'+this.dName+':4100/'+this.state.moistDad.path+'")'}}></div>);
+    }
 
+    return farts;
   }
 
   componentDidMount() {
-    this.initFilePond()
     this.updateDadOfDay()
     this.updatePastDads()
   }
@@ -79,12 +88,13 @@ constructor (props) {
           <div className="moist-old-dads">
             {this.state.latestDads.map((dad, index) => (
               <div key={index}>
-                <img src={'http://'+this.dName+':4100/'+dad.files[0].thumbPath}/>
+                <img alt={dad.files[0].originalname} src={'http://'+this.dName+':4100/'+dad.files[0].thumbPath}/>
               </div>
             ))}
           </div>
-          <div className="moist-bg" style={{backgroundImage:'url("'+this.state.moistDad+'")'}}>
-          </div>
+
+          {this.generateDadMedia()}
+
           <Button className="moist-modal-btn" variant="primary" onClick={this.handleOpen}>
             Upload a Moist Dad!
           </Button>
@@ -94,7 +104,7 @@ constructor (props) {
             </Modal.Header>
 
             <Modal.Body>
-            <FilePond maxFiles={3}
+            <FilePond maxFiles={1}
                       ref={ref => this.pond = ref}
                       server={{
                         url: 'http://'+this.dName+':4100/api/upload'
@@ -102,7 +112,7 @@ constructor (props) {
                       onprocessfiles={(error,file) => {
                         this.updateDadOfDay()
                         this.updatePastDads()
-                        this.setState({ alertOpen: true })
+                        this.setState({ alertOpen: true, modalOpen:false })
                       }}
                       allowMultiple={true}
                       files={this.state.files}
