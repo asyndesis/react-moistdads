@@ -16,7 +16,7 @@ var storage = multer.diskStorage({
   },
   filename: function (req, file, cb) {
     /* ToDo: This needs code to parse the mimetype and just append .ext to file before saving */
-    cb(null, tools.generateUID() +'_'+ file.originalname);        
+    cb(null, tools.generateUID() +'.'+ file.originalname.split('.').pop());        
   }
 })
 const upload = multer({ storage: storage }).single('filepond');

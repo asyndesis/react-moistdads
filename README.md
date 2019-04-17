@@ -1,4 +1,4 @@
-# moistdads
+# Moist Dads Website
 
 - Make sure your in the root directory (moistdads folder)
 
@@ -19,3 +19,10 @@
 
 ### View
 5. url_here
+
+# ToDo:
+- Serverside upload size / type limit
+- Clientside upload size / type limit
+- Make moistdadofday be a parameter on an upload
+- Make an endpoint for MDOD preview.
+- Make an endpoint that creates or grabs the MDOD and makes it a favicon.

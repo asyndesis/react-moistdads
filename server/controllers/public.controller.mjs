@@ -6,22 +6,46 @@ import bcrypt from 'bcryptjs';
 import moment from 'moment';
 import gm from 'gm';
 
+
 const Upload = mongoose.model('Upload');
-const _saveThumbnail = (imagePath) => { // edited arg
-  return new Promise((resolve, reject) => {
-    var n=imagePath.lastIndexOf(".");
-    var thumbPath = imagePath.substring(0,n)+"_thumb"+imagePath.substring(n);
-    gm(imagePath).thumb(150, 150, `${thumbPath}`, 100, (err) => { // edited
-      if (err) reject(new Error(err));
-      resolve();
-    });
-  });
+
+
+//this shells out a thumbnail for what was uploaded
+const _saveThumbnail = (file) => { // edited arg
+  let mime = file.mimetype.split('/');
+      mime = mime[0];
+  console.log(mime);
+  switch (mime){
+    case 'image' :
+      return new Promise((resolve, reject) => {
+        var n=file.path.lastIndexOf(".");
+        var thumbPath = file.path.substring(0,n)+"_thumb"+file.path.substring(n);
+        gm(file.path).thumb(150, 150, `${thumbPath}`, 100, (err) => { // edited
+          if (err) reject(new Error(err));
+          resolve();
+        });
+      });
+      break;
+    case 'video' :
+      return new Promise((resolve, reject) => {
+        reject(new Error('farts'));
+      });
+      break;
+    default :
+      return new Promise((resolve, reject) => {
+        reject(new Error('farts'));
+      });
+      break;
+  }
+
+
+
+
 };
 
 let publicController = {
 
   upload: (req, res, next) => {
-    console.log(res.req);
     let file = res.req.file;
     let upload = new Upload();
         upload.id = uuid.v1()
@@ -32,8 +56,8 @@ let publicController = {
       next();
     }
 
-     // save that thumb and return a response
-    _saveThumbnail(file.path).then(() => {
+     // save that thumb
+    _saveThumbnail(file).then(() => {
       let n=file.path.lastIndexOf(".");
       let thumbPath = file.path.substring(0,n)+"_thumb"+file.path.substring(n);
       file.thumbPath = thumbPath;
@@ -44,12 +68,12 @@ let publicController = {
         res.status('201').send(payload);
         next();
       }).catch((error) => { 
-        tools.burp('FgYellow','webserver','Upload could not be created.','controllers.public' )
-        res.status('400').send({message: 'Upload could not be created.'});
+        tools.burp('FgYellow','webserver','Upload could not be saved.','controllers.public' )
+        res.status('400').send({message: 'Upload could not be saved.'});
         next();
       });
     }).catch((error) => {
-      tools.burp('FgYellow','webserver','Upload could not be created.','controllers.public' )
+      tools.burp('FgYellow','webserver',error,'controllers.public' )
       res.status('400').send({message: 'Upload could not be created.'});
     });
 

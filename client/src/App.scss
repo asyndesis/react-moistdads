@@ -5,7 +5,7 @@
 }
 .moist-old-dads{
   background:#222;
-  width:20vw;
+  width:100px;
   height: 100vh;
   left:0;
   position:fixed;
@@ -16,7 +16,7 @@
 }
 .moist-bg{
   height:100vh;
-  width:80vw;
+  width:calc(100vw - 100px);
   background-size:contain;
   background-color:#000;
   background-repeat:no-repeat;
