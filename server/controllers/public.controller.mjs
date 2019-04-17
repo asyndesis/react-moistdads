@@ -10,13 +10,15 @@ import ffmpeg from 'fluent-ffmpeg';
 
 const Upload = mongoose.model('Upload');
 
-
-//this shells out a thumbnail for what was uploaded
-const _saveThumbnail = (file) => { // edited arg
+//ToDo: These 'Helper functions' need a fucking home. they're clogging up my GODDAMN controller
+//this shells out a thumbnail for what was uploaded and returns a promise 
+//this is the first time i documented a function that returned a promise :)
+const _saveThumbnail = (file) => { 
   let mime = file.mimetype.split('/');
       mime = mime[0];
   let n, thumbPath;
 
+  // are we dealing with an image or a video?
   switch (mime){
     case 'image' :
       n = file.path.lastIndexOf(".");
@@ -28,7 +30,7 @@ const _saveThumbnail = (file) => { // edited arg
         });
       });
       break;
-    case 'video' :
+    case 'video' : //ffmpeg swamp. this gets buggy and scary and i'm not sure why output options needs to be here.
       n = file.filename.lastIndexOf(".");
       thumbPath = file.filename.substring(0,n)+"_thumb"+'_v'+'.png'
       return new Promise((resolve, reject) => {
@@ -55,7 +57,7 @@ const _saveThumbnail = (file) => { // edited arg
       break;
     default :
       return new Promise((resolve, reject) => {
-        reject(new Error('farts'));
+        reject(new Error('video and image only'));
       });
       break;
   }

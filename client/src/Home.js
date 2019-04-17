@@ -66,7 +66,7 @@ constructor (props) {
     let farts = '';
     if (this.state.mediaType === 'video'){
       farts = (
-        <video className="moist-bg" autoPlay loop id="video-background" muted playsInline >
+        <video className="moist-bg" autoPlay loop id="video-background" playsInline >
           <source src={'http://'+this.dName+':4100/'+this.state.moistDad.path} type={this.state.moistDad.mimetype}></source>
         </video>
       );
