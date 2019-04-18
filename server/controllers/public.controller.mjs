@@ -23,12 +23,12 @@ const _saveThumbnail = (file) => {
   // are we dealing with an image or a video?
   switch (mime){
     case 'image' :
-      n = file.path.lastIndexOf(".");
-      thumbPath = file.path.substring(0,n)+"_thumb"+'.png';
+      n = file.filename.lastIndexOf(".");
+      thumbPath = file.filename.substring(0,n)+"_thumb"+'.png'
       return new Promise((resolve, reject) => {
         gm(file.path).resize(thumbSize, thumbSize, '!').write(`${thumbPath}`,(err) => { // edited
           if (err) reject(new Error(err));
-          resolve(thumbPath);
+          resolve((process.env.uploadDirectory).substring(1)+'/'+thumbPath);
         });
       });
       break;
