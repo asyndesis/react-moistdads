@@ -44,7 +44,7 @@ const _saveThumbnail = (file) => {
         })
         .on('end', function() {
           tools.burp('FgCyan','webserver','Video creenshots taken','controllers.public' )
-          resolve(process.env.uploadDirectory+'/'+thumbPath);
+          resolve((process.env.uploadDirectory).substring(1)+'/'+thumbPath);
         })
         .on('error',function(err){
           tools.burp('FgRed','webserver',err,'controllers.public' )
@@ -159,7 +159,7 @@ let publicController = {
       }
     }).then((payload) => {
       tools.burp('FgCyan','webserver','Moist preview of day requested.','controllers.public' )
-      res.status('201').set({'Content-Type': 'image/png'}).sendFile(path.resolve() + payload.files[0].thumbPath.substring(1));
+      res.status('201').set({'Content-Type': 'image/png'}).sendFile(path.resolve() + payload.files[0].thumbPath);
     }).catch((error) => { 
       tools.burp('FgYellow','webserver',error,'controllers.public' )
       res.status('400').send({message: 'Moist preview could not be found.'});
