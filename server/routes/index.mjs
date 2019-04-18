@@ -72,6 +72,6 @@ router.post('/upload',upload,publicController.upload)
 router.get('/getMoistDadOfDay',publicController.getMoistDadOfDay)
 router.get('/getLatestDads',publicController.getLatestDads)
 router.get('/getDadById',publicController.getDadById)
-router.get('/getDadPreview',publicController.getDadPreview)
+router.get('/getDadPreview.png',publicController.getDadPreview)
 
 export {router}

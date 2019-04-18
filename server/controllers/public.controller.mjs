@@ -18,15 +18,15 @@ const _saveThumbnail = (file) => {
   let mime = file.mimetype.split('/');
       mime = mime[0];
   let n, thumbPath;
-  let thumbSize = 300;
+  let thumbSize = 400;
 
   // are we dealing with an image or a video?
   switch (mime){
     case 'image' :
       n = file.path.lastIndexOf(".");
-      thumbPath = file.path.substring(0,n)+"_thumb"+file.path.substring(n);
+      thumbPath = file.path.substring(0,n)+"_thumb"+'.png';
       return new Promise((resolve, reject) => {
-        gm(file.path).thumb(thumbSize, thumbSize, `${thumbPath}`, 100, (err) => { // edited
+        gm(file.path).resize(thumbSize, thumbSize, '!').write(`${thumbPath}`,(err) => { // edited
           if (err) reject(new Error(err));
           resolve(thumbPath);
         });
@@ -159,7 +159,7 @@ let publicController = {
       }
     }).then((payload) => {
       tools.burp('FgCyan','webserver','Moist preview of day requested.','controllers.public' )
-      res.status('201').sendFile(path.resolve() + payload.files[0].thumbPath.substring(1));
+      res.status('201').set({'Content-Type': 'image/png'}).sendFile(path.resolve() + payload.files[0].thumbPath.substring(1));
     }).catch((error) => { 
       tools.burp('FgYellow','webserver',error,'controllers.public' )
       res.status('400').send({message: 'Moist preview could not be found.'});
