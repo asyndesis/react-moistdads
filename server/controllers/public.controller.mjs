@@ -15,24 +15,26 @@ const Upload = mongoose.model('Upload');
 //this shells out a thumbnail for what was uploaded and returns a promise 
 //this is the first time i documented a function that returned a promise :)
 const _saveThumbnail = (file) => { 
-  let mime = file.mimetype.split('/');
-      mime = mime[0];
+  let mime = file.mimetype;
   let n, thumbPath;
   let thumbSize = 400;
 
   // are we dealing with an image or a video?
   switch (mime){
-    case 'image' :
+    case 'image/png' :
+    case 'image/gif' :
+    case 'image/jpeg' :
+    case 'image/jpg' :
       n = file.filename.lastIndexOf(".");
-      thumbPath = file.filename.substring(0,n)+"_thumb"+'.png'
+      thumbPath = (process.env.uploadDirectory)+'/'+file.filename.substring(0,n)+"_thumb"+'.png'
       return new Promise((resolve, reject) => {
         gm(file.path).resize(thumbSize, thumbSize, '!').write(`${thumbPath}`,(err) => { // edited
           if (err) reject(new Error(err));
-          resolve((process.env.uploadDirectory).substring(1)+'/'+thumbPath);
+          resolve(thumbPath);
         });
       });
       break;
-    case 'video' : //ffmpeg swamp. this gets buggy and scary and i'm not sure why output options needs to be here.
+    case 'video/mp4' : //ffmpeg swamp. this gets buggy and scary and i'm not sure why output options needs to be here.
       n = file.filename.lastIndexOf(".");
       thumbPath = file.filename.substring(0,n)+"_thumb"+'_v'+'.png'
       return new Promise((resolve, reject) => {
@@ -44,7 +46,8 @@ const _saveThumbnail = (file) => {
         })
         .on('end', function() {
           tools.burp('FgCyan','webserver','Video creenshots taken','controllers.public' )
-          resolve((process.env.uploadDirectory).substring(1)+'/'+thumbPath);
+          thumbPath = (process.env.uploadDirectory).substring(2)+'/'+thumbPath;
+          resolve(thumbPath);
         })
         .on('error',function(err){
           tools.burp('FgRed','webserver',err,'controllers.public' )
@@ -85,6 +88,7 @@ let publicController = {
 
      // save that thumb
     _saveThumbnail(file).then((thumbPath) => {
+      console.log(thumbPath);
       file.thumbPath = thumbPath;
       upload.files.push(file);
       //db saving
