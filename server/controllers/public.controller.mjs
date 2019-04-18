@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import moment from 'moment';
 import gm from 'gm'; //graphicsmagick
 import ffmpeg from 'fluent-ffmpeg';
+import path from 'path';
 
 
 const Upload = mongoose.model('Upload');
@@ -17,6 +18,7 @@ const _saveThumbnail = (file) => {
   let mime = file.mimetype.split('/');
       mime = mime[0];
   let n, thumbPath;
+  let thumbSize = 300;
 
   // are we dealing with an image or a video?
   switch (mime){
@@ -24,7 +26,7 @@ const _saveThumbnail = (file) => {
       n = file.path.lastIndexOf(".");
       thumbPath = file.path.substring(0,n)+"_thumb"+file.path.substring(n);
       return new Promise((resolve, reject) => {
-        gm(file.path).thumb(150, 150, `${thumbPath}`, 100, (err) => { // edited
+        gm(file.path).thumb(thumbSize, thumbSize, `${thumbPath}`, 100, (err) => { // edited
           if (err) reject(new Error(err));
           resolve(thumbPath);
         });
@@ -52,7 +54,7 @@ const _saveThumbnail = (file) => {
           count:1,
           filename: thumbPath,
           folder: process.env.uploadDirectory,
-        }).outputOptions(['-vframes 1', '-vcodec png',  '-s 150x150', '-ss 00:00:00'])
+        }).outputOptions(['-vframes 1', '-vcodec png',  '-s '+thumbSize+'x'+thumbSize, '-ss 00:00:00'])
 
       });
       break;
@@ -144,8 +146,26 @@ let publicController = {
       res.status('400').send({message: 'Dad with that Id could not be found.'});
       next();
     });
-  }
+  },
 
+  getDadPreview: (req,res,next) => {
+    let today = new Date();
+    let yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    Upload.findOne({
+      date: {
+        $gte: moment(yesterday).startOf('day').toDate(),
+        $lte: moment(today).endOf('day').toDate()
+      }
+    }).then((payload) => {
+      tools.burp('FgCyan','webserver','Moist preview of day requested.','controllers.public' )
+      res.status('201').sendFile(path.resolve() + payload.files[0].thumbPath.substring(1));
+    }).catch((error) => { 
+      tools.burp('FgYellow','webserver',error,'controllers.public' )
+      res.status('400').send({message: 'Moist preview could not be found.'});
+      next();
+    });
+  }
 
 }
 
