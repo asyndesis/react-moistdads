@@ -4,7 +4,7 @@ import uuid from 'node-uuid';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import moment from 'moment';
-import gm from 'gm';
+import gm from 'gm'; //graphicsmagick
 import ffmpeg from 'fluent-ffmpeg';
 
 
@@ -34,6 +34,7 @@ const _saveThumbnail = (file) => {
       n = file.filename.lastIndexOf(".");
       thumbPath = file.filename.substring(0,n)+"_thumb"+'_v'+'.png'
       return new Promise((resolve, reject) => {
+        /* ToDo: eed everything to be converted to Mp4 here somehow */
         ffmpeg(file.path)
         .withVideoCodec('libx264')
         .on('filenames', function(filenames) {
@@ -51,7 +52,7 @@ const _saveThumbnail = (file) => {
           count:1,
           filename: thumbPath,
           folder: process.env.uploadDirectory,
-        }).outputOptions(['-vframes 1', '-vcodec png', '-f rawvideo', '-s 320x240', '-ss 00:00:01'])
+        }).outputOptions(['-vframes 1', '-vcodec png',  '-s 150x150', '-ss 00:00:00'])
 
       });
       break;
@@ -104,7 +105,7 @@ let publicController = {
     let today = new Date();
     let yesterday = new Date();
     yesterday.setDate(today.getDate() - 1);
-    Upload.find({
+    Upload.findOne({
       date: {
         $gte: moment(yesterday).startOf('day').toDate(),
         $lte: moment(today).endOf('day').toDate()
@@ -129,6 +130,18 @@ let publicController = {
     }).catch((error) => { 
       tools.burp('FgCyan','webserver','Latest dads failed.','controllers.public' )
       res.status('400').send({message: 'Latest dads could not be found.'});
+      next();
+    });
+  },
+
+  getDadById: (req,res,next) => {
+    Upload.findOne({id: req.query.id}).then((payload) => {
+      tools.burp('FgCyan','webserver','Dad with id: '+req.query.id+' supplied.','controllers.public' )
+      res.status('201').send(payload);
+      next();
+    }).catch((error) => { 
+      tools.burp('FgCyan','webserver','Latest dads failed.','controllers.public' )
+      res.status('400').send({message: 'Dad with that Id could not be found.'});
       next();
     });
   }

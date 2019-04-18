@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-import { view } from 'react-easy-state';
+//import { view } from 'react-easy-state';
 import SweetAlert from 'sweetalert2-react';
 import { FilePond } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { Link, withRouter } from 'react-router-dom'
 
 class Home extends Component {
 constructor (props) {
@@ -38,18 +39,24 @@ constructor (props) {
     }
   }
 
-  updateDadOfDay(){
-    fetch('http://'+this.dName+':4100/api/getMoistDadOfDay', {
+  updateMainDad = () => {
+    let dadUrl = 'http://'+this.dName+':4100/api/getMoistDadOfDay';
+    /* are we looking at a specific dad? */
+    if (this.props.match.params.id){
+      dadUrl = 'http://'+this.dName+':4100/api/getDadById?id='+this.props.match.params.id;
+    }
+    fetch(dadUrl, {
       method: 'GET'
     }).then(res => res.json())
     .then(response => {
-      if (response[0]){
-        let mime = response[0].files[0].mimetype.split('/');
+      if (response){
+        let mime = response.files[0].mimetype.split('/');
         mime = mime[0];
-        this.setState({moistDad:response[0].files[0],mediaType:mime})
+        this.setState({moistDad:response.files[0],mediaType:mime})
       }
     })
     .catch(error => console.error('Error:', error));
+
   }
 
   updatePastDads(){
@@ -62,11 +69,11 @@ constructor (props) {
     .catch(error => console.error('Error:', error));
   }
 
-  generateDadMedia(){
+  generateDadMedia(autoplay){
     let farts = '';
     if (this.state.mediaType === 'video'){
       farts = (
-        <video className="moist-bg" autoPlay loop id="video-background" playsInline >
+        <video autoPlay key={this.state.moistDad.filename} controls className="moist-bg" loop id="video-background" playsInline>
           <source src={'http://'+this.dName+':4100/'+this.state.moistDad.path} type={this.state.moistDad.mimetype}></source>
         </video>
       );
@@ -78,18 +85,25 @@ constructor (props) {
   }
 
   componentDidMount() {
-    this.updateDadOfDay()
+    this.updateMainDad()
     this.updatePastDads()
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.location.pathname !== prevProps.location.pathname) {
+      this.updateMainDad(true)
+    }
+  }
+
   render () {
+    console.log('rend');
     return (
       <div>
           <div className="moist-old-dads">
             {this.state.latestDads.map((dad, index) => (
-              <div key={index}>
+              <Link to={"/dad/"+dad.id} key={index}>
                 <img alt={dad.files[0].originalname} src={'http://'+this.dName+':4100/'+dad.files[0].thumbPath}/>
-              </div>
+              </Link>
             ))}
           </div>
 
@@ -110,7 +124,7 @@ constructor (props) {
                         url: 'http://'+this.dName+':4100/api/upload'
                       }}
                       onprocessfiles={(error,file) => {
-                        this.updateDadOfDay()
+                        this.updateMainDad()
                         this.updatePastDads()
                         this.setState({ alertOpen: true, modalOpen:false })
                       }}
@@ -135,4 +149,4 @@ constructor (props) {
   }
 }
 
-export default view(Home);
+export default withRouter(Home);

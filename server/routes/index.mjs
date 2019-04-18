@@ -71,5 +71,6 @@ router.post('/updateCurrentUser',userController.updateCurrentUser)
 router.post('/upload',upload,publicController.upload)
 router.get('/getMoistDadOfDay',publicController.getMoistDadOfDay)
 router.get('/getLatestDads',publicController.getLatestDads)
+router.get('/getDadById',publicController.getDadById)
 
 export {router}

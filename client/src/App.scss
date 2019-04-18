@@ -1,7 +1,7 @@
 .moist-modal-btn{
   position:fixed;
-  right:10px;
-  bottom:10px;
+  left:110px;
+  top:10px;
 }
 .moist-old-dads{
   background:#222;
@@ -15,6 +15,7 @@
   }
 }
 .moist-bg{
+  outline:none;
   height:100vh;
   width:calc(100vw - 100px);
   background-size:contain;
