@@ -159,7 +159,7 @@ let publicController = {
       }
     }).then((payload) => {
       tools.burp('FgCyan','webserver','Moist preview of day requested.','controllers.public' )
-      res.status('201').set({'Content-Type': 'image/png'}).sendFile(path.resolve() + payload.files[0].thumbPath);
+      res.status('201').set({'Content-Type': 'image/png'}).sendFile(path.resolve() +'/'+ payload.files[0].thumbPath);
     }).catch((error) => { 
       tools.burp('FgYellow','webserver',error,'controllers.public' )
       res.status('400').send({message: 'Moist preview could not be found.'});
