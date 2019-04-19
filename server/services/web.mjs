@@ -32,7 +32,7 @@ webEngines.startWebServer = (webServerPort) => {
 
   /* Uploads folder */
   //console.log(process.cwd());
-  webServer.use('/uploads', express.static(process.cwd() + '/uploads'));
+  webServer.use('/public/uploads', express.static(process.cwd() + '/public/uploads'));
 
   webServer.use(cors())
   webServer.use('/api',router)

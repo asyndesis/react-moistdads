@@ -12,7 +12,7 @@ const router = express.Router();
 /* Hacky CB For Multer */
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, process.env.uploadDirectory)
+    cb(null, process.env.scratchDirectory)
   },
   filename: function (req, file, cb) {
     /* ToDo: This needs code to parse the mimetype and just append .ext to file before saving */

@@ -11,54 +11,90 @@ import path from 'path';
 
 const Upload = mongoose.model('Upload');
 
-//ToDo: These 'Helper functions' need a fucking home. they're clogging up my GODDAMN controller
-//this shells out a thumbnail for what was uploaded and returns a promise 
-//this is the first time i documented a function that returned a promise :)
-const _saveThumbnail = (file) => { 
+//ToDo: These F@cKin' 'Helper functions' need a fucking home. they're clogging up my GODDAMN controller
+
+// _saveThumbnail 
+// @input file: File
+// returns Promise
+const _barfFileSizes = (file) => {
   let mime = file.mimetype;
-  let n, thumbPath;
+  let n, thumbPath, mainPath;
   let thumbSize = 400;
 
   // are we dealing with an image or a video?
   switch (mime){
-    case 'image/png' :
     case 'image/gif' :
+      n = file.filename.lastIndexOf(".");
+      mainPath = (process.env.uploadDirectory)+'/'+file.filename.substring(0,n)
+      thumbPath = mainPath+"_thumb"+'.png'
+      return new Promise((resolve, reject) => {
+        // barf the big image into uploads
+        gm(file.path).write(mainPath+'.gif', (err) => {
+          // turn to thumbies
+          if (!err)
+          gm(file.path).resize(thumbSize, thumbSize).write(thumbPath, (err) => { // edited
+            if (err) reject(new Error(err));
+            file.path = mainPath+'.gif';
+            file.thumbPath = thumbPath;
+            resolve(file);
+          });
+        });
+      });
+      break;
+    case 'image/png' :
     case 'image/jpeg' :
     case 'image/jpg' :
       n = file.filename.lastIndexOf(".");
-      thumbPath = (process.env.uploadDirectory)+'/'+file.filename.substring(0,n)+"_thumb"+'.png'
+      mainPath = (process.env.uploadDirectory)+'/'+file.filename.substring(0,n)
+      thumbPath = mainPath+"_thumb"+'.png'
       return new Promise((resolve, reject) => {
-        gm(file.path).resize(thumbSize, thumbSize, '!').write(`${thumbPath}`,(err) => { // edited
-          if (err) reject(new Error(err));
-          resolve(thumbPath);
+        // barf the big image into uploads
+        gm(file.path).resize(800,800).write(mainPath+'.png', (err) => {
+          // turn to thumbies
+          if (!err)
+          gm(file.path).resize(thumbSize, thumbSize).write(thumbPath, (err) => { // edited
+            if (err) reject(new Error(err));
+            file.path = mainPath+'.png';
+            file.thumbPath = thumbPath;
+            resolve(file);
+          });
         });
       });
       break;
     case 'video/mp4' : //ffmpeg swamp. this gets buggy and scary and i'm not sure why output options needs to be here.
+    case 'video/quicktime' :
       n = file.filename.lastIndexOf(".");
+      mainPath = (process.env.uploadDirectory)+'/'+file.filename.substring(0,n)
       thumbPath = file.filename.substring(0,n)+"_thumb"+'_v'+'.png'
       return new Promise((resolve, reject) => {
-        /* ToDo: eed everything to be converted to Mp4 here somehow */
-        ffmpeg(file.path)
-        .withVideoCodec('libx264')
-        .on('filenames', function(filenames) {
-          tools.burp('FgCyan','webserver','Will generate ' + filenames.join(', '),'controllers.public' )
-        })
-        .on('end', function() {
-          tools.burp('FgCyan','webserver','Video creenshots taken','controllers.public' )
-          thumbPath = (process.env.uploadDirectory).substring(2)+'/'+thumbPath;
-          resolve(thumbPath);
+        // move and format video
+        ffmpeg(file.path).withVideoCodec('libx264').format('mp4').size('?x480')
+        .on('end', function(stdout, stderr) {
+          // long winded thumbnails
+          ffmpeg(file.path)
+          .withVideoCodec('libx264')
+          .on('end', function() {
+            tools.burp('FgCyan','webserver','Video creenshots taken','controllers.public' )
+            file.thumbPath = (process.env.uploadDirectory).substring(2)+'/'+thumbPath;
+            file.path = mainPath+'.mp4';
+            file.mimetype = 'video/mp4';
+            resolve(file);
+          })
+          .on('error',function(err){
+            tools.burp('FgRed','webserver',err,'controllers.public' )
+          })
+          .screenshots({
+            //timestamps: ['20%', '40%', '60%'],
+            count:1,
+            filename: thumbPath,
+            folder: process.env.uploadDirectory,
+          }).outputOptions(['-vframes 1', '-vcodec png', '-ss 00:00:00'])
+          tools.burp('FgCyan','webserver','Video moved from scratch and converted to mp4','controllers.public' )
         })
         .on('error',function(err){
           tools.burp('FgRed','webserver',err,'controllers.public' )
         })
-        .screenshots({
-          //timestamps: ['20%', '40%', '60%'],
-          count:1,
-          filename: thumbPath,
-          folder: process.env.uploadDirectory,
-        }).outputOptions(['-vframes 1', '-vcodec png',  '-s '+thumbSize+'x'+thumbSize, '-ss 00:00:00'])
-
+        .save(mainPath+'.mp4');
       });
       break;
     default :
@@ -67,10 +103,6 @@ const _saveThumbnail = (file) => {
       });
       break;
   }
-
-
-
-
 };
 
 let publicController = {
@@ -81,16 +113,17 @@ let publicController = {
         upload.id = uuid.v1()
         upload.files = [];
     //if this error comes up, something is happing at middleware level (routes middleware)
-    if (!res.req.file){   
+    if (!file){   
       tools.burp('FgYellow','webserver','No file was uploaded.','controllers.public' )
-      next();
+      return res.status('400').send({message: 'Upload could not be created.'});
     }
-
-     // save that thumb
-    _saveThumbnail(file).then((thumbPath) => {
-      console.log(thumbPath);
-      file.thumbPath = thumbPath;
-      upload.files.push(file);
+    if (file.size > 5963164){
+      tools.burp('FgYellow','webserver','File was too large to be uploaded.','controllers.public' )
+      return res.status('400').send({message: 'Upload could not be created.'});
+    }
+    // save that thumb
+    _barfFileSizes(file).then((upFile) => {
+      upload.files.push(upFile);
       //db saving
       upload.save().then((payload) => {
         tools.burp('FgCyan','webserver','Upload with id: \''+payload.id+'\' has been created with a _thumb','controllers.public' )
@@ -107,6 +140,7 @@ let publicController = {
     });
 
   },
+
   getMoistDadOfDay: (req, res, next) => {
     let today = new Date();
     let yesterday = new Date();

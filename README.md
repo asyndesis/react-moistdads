@@ -24,6 +24,7 @@
 # ToDo:
 - Serverside upload size / type limit
 - Clientside upload size / type limit
-- Make moistdadofday be a parameter on an upload
-- Make an endpoint for MDOD preview.
+- Add serverside initial mime / filesize validation (prior to saving upload)
+✅ Make moistdadofday be a parameter on an upload
+✅ Make an endpoint for MDOD preview.
 - Make an endpoint that creates or grabs the MDOD and makes it a favicon.
