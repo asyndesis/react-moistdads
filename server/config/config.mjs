@@ -7,7 +7,7 @@ export default {
     socketPort: 'o_o?', /* update socket server file when you find out how to pass a socket */
     uploadDirectory: './public/uploads',
     scratchDirectory: './public/scratch',
-    maxUploadSize: 5963164
+    maxUploadSize: 8963164
   },
   production : {
     auth: false,
@@ -17,6 +17,6 @@ export default {
     socketPort: 'o_o',
     uploadDirectory: './public/uploads',
     scratchDirectory: './public/scratch',
-    maxUploadSize: 5963164
+    maxUploadSize: 8963164
   }
 }   

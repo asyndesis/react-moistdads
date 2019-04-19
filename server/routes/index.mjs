@@ -20,7 +20,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({
   storage: storage,
-  limits: { fileSize: 5963164} //this breaks when calling process.node.env.maxUploadSize
+  limits: { fileSize: 8963164} //this breaks when calling process.node.env.maxUploadSize
 }).single('filepond')
 
 const tokenAuth = (req, res, next) => {
