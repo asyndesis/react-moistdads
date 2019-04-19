@@ -117,7 +117,7 @@ let publicController = {
       tools.burp('FgYellow','webserver','No file was uploaded.','controllers.public' )
       return res.status('400').send({message: 'Upload could not be created.'});
     }
-    if (file.size > 5963164){
+    if (file.size > process.env.maxUploadSize){
       tools.burp('FgYellow','webserver','File was too large to be uploaded.','controllers.public' )
       return res.status('400').send({message: 'Upload could not be created.'});
     }

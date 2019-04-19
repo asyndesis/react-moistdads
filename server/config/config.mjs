@@ -6,7 +6,8 @@ export default {
     mongoDatabaseUri : "mongodb://localhost:27017/moistdads",
     socketPort: 'o_o?', /* update socket server file when you find out how to pass a socket */
     uploadDirectory: './public/uploads',
-    scratchDirectory: './public/scratch'
+    scratchDirectory: './public/scratch',
+    maxUploadSize: 5963164
   },
   production : {
     auth: false,
@@ -15,6 +16,7 @@ export default {
     mongoDatabaseUri : "mongodb://xxxxx/moistdads",
     socketPort: 'o_o',
     uploadDirectory: './public/uploads',
-    scratchDirectory: './public/scratch'
+    scratchDirectory: './public/scratch',
+    maxUploadSize: 5963164
   }
 }   

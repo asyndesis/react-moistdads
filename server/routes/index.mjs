@@ -5,8 +5,6 @@ import jwt from 'jsonwebtoken'
 import tools from '../tools/'
 import multer from 'multer'
 
-
-
 const router = express.Router();
 
 /* Hacky CB For Multer */
@@ -19,8 +17,11 @@ var storage = multer.diskStorage({
     cb(null, tools.generateUID() +'.'+ file.originalname.split('.').pop());        
   }
 })
-const upload = multer({ storage: storage }).single('filepond');
 
+var upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 }//needs to be gotten from proces.env.uploadSize and converted from bytes.
+}).single('filepond')
 
 const tokenAuth = (req, res, next) => {
   /* Non-protected routes. This is hacky. I know */
