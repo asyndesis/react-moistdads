@@ -22,7 +22,7 @@ constructor (props) {
       alertText: 'You have uploaded a Moist Dad!'
     }
 
-    this.dName = 'localhost';
+    this.dName = 'moistdads.com';
     this.handleOpen = () => {
       this.setState({
         modalOpen: true,

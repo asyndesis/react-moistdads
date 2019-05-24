@@ -164,7 +164,7 @@ let publicController = {
 
   getLatestDads: (req, res, next) => {
     Upload.find({
-    }).sort('-date').limit(20).then((payload) => {
+    }).sort('-date').limit(100).then((payload) => {
       tools.burp('FgCyan','webserver','Latest dads requested.','controllers.public' )
       res.status('201').send(payload);
       next();
