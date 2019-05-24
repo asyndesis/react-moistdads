@@ -12,7 +12,7 @@ export default {
   production : {
     auth: false,
     jwtSecret: 'arfarfarfarf123123farts',
-    webServerPort : 80,
+    webServerPort : 4100,
     mongoDatabaseUri : "mongodb://xxxxx/moistdads",
     socketPort: 'o_o',
     uploadDirectory: './public/uploads',
