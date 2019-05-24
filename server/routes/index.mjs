@@ -73,6 +73,7 @@ router.post('/upload',upload,publicController.upload)
 router.get('/getMoistDadOfDay',publicController.getMoistDadOfDay)
 router.get('/getLatestDads',publicController.getLatestDads)
 router.get('/getDadById',publicController.getDadById)
-router.get('/getDadPreview.png',publicController.getDadPreview)
+router.get('/getDadPreview.png',publicController.getDadPreview) //old fb style
+router.get('/getDadThumb',publicController.getDadPreview)
 
 export {router}
