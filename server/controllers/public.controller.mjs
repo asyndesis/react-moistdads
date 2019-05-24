@@ -11,7 +11,8 @@ import path from 'path';
 
 const Upload = mongoose.model('Upload');
 
-//ToDo: These F@cKin' 'Helper functions' need a fucking home. they're clogging up my GODDAMN controller
+// ToDo: These F@cKin' 'Helper functions' need a fucking home. they're clogging up my GODDAMN controller
+// also, this needs to be better promise-ized. it's a damn nested mess.
 
 // _saveThumbnail 
 // @input file: File
@@ -61,7 +62,7 @@ const _barfFileSizes = (file) => {
         });
       });
       break;
-    case 'video/mp4' : //ffmpeg swamp. this gets buggy and scary and i'm not sure why output options needs to be here.
+    case 'video/mp4' : 
     case 'video/quicktime' :
       n = file.filename.lastIndexOf(".");
       mainPath = (process.env.uploadDirectory)+'/'+file.filename.substring(0,n)

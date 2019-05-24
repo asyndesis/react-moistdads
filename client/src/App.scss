@@ -13,6 +13,13 @@
   img{
     width:100%;
   }
+  a{
+    opacity:.75;
+    transition:.1s ease all;
+    &:hover{
+      opacity:1;
+    }
+  }
 }
 .moist-bg{
   outline:none;

@@ -22,9 +22,9 @@
 5. url_here
 
 # ToDo:
-- Serverside upload size / type limit
-- Clientside upload size / type limit
-- Add serverside initial mime / filesize validation (prior to saving upload)
+✅ Convert Movs to mp4s
+✅ Add serverside initial mime / filesize validation 
 ✅ Make moistdadofday be a parameter on an upload
 ✅ Make an endpoint for MDOD preview.
+- remove uploads that are too big 
 - Make an endpoint that creates or grabs the MDOD and makes it a favicon.
