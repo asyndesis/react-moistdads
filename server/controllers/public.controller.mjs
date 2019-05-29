@@ -207,10 +207,9 @@ let publicController = {
   },
 
   getDadThumb: (req,res,next) => {
-    Upload.findOne({id: req.query.id}).then((payload) => {
-      tools.burp('FgCyan','webserver','Page Preview Thumb requested.','controllers.public' )
+    Upload.findOne({id: req.params.id}).then((payload) => {
+      tools.burp('FgCyan','webserver','Page Preview Thumb requested.','controllers.public' );
       res.status('201').set({'Content-Type': 'image/png'}).sendFile(path.resolve() +'/'+ payload.files[0].thumbPath);
-      next();
     }).catch((error) => { 
       tools.burp('FgCyan','webserver','Page Preview Thumb failed.','controllers.public' )
       res.status('400').send({message: 'Dad with that Id could not be found.'});

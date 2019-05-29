@@ -74,6 +74,6 @@ router.get('/getMoistDadOfDay',publicController.getMoistDadOfDay)
 router.get('/getLatestDads',publicController.getLatestDads)
 router.get('/getDadById',publicController.getDadById)
 router.get('/getDadPreview.png',publicController.getDadPreview) //old fb style
-router.get('/getDadThumb',publicController.getDadPreview)
+router.get('/getDadThumb/:id',publicController.getDadThumb)
 
 export {router}
