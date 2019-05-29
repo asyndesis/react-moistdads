@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon --experimental-modules app.mjs",
+    "start": "nodemon -r esm app.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -13,6 +13,7 @@
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
+    "esm": "^3.2.25",
     "express": "^4.16.4",
     "fluent-ffmpeg": "^2.1.2",
     "gm": "^1.23.1",
