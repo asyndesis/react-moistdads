@@ -21,10 +21,10 @@
 ### View
 5. url_here
 
-# ToDo:
-✅ Convert Movs to mp4s
-✅ Add serverside initial mime / filesize validation 
-✅ Make moistdadofday be a parameter on an upload
-✅ Make an endpoint for MDOD preview.
-- remove uploads that are too big 
-- Make an endpoint that creates or grabs the MDOD and makes it a favicon.
+### ToDo:
+- ✅ Convert Movs to mp4s
+- ✅ Add serverside initial mime / filesize validation 
+- ✅ Make moistdadofday be a parameter on an upload
+- ✅ Make an endpoint for MDOD preview.
+- 🅾️ remove uploads that are too big 
+- 🅾️ Make an endpoint that creates or grabs the MDOD and makes it a favicon.
